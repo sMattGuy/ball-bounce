@@ -29,6 +29,18 @@
 			</div>
 			<p>Click and drag to move</p>
 		</div>
+		<div id="globalMenu" class="ballMenu gMenu">
+			<h4>Global menu</h4>
+			<div id="gOptions">
+			<label for="time">Time</label><input type="range" id="time" min="0" max="2" step="0.1">
+			<br>
+			<label for="gravity">Gravity</label><input type="range" id="gravity" min="0" max="10" step="0.1">
+			<br>
+			<label for="power">Shot Power</label><input type="range" id="power" min="0" max="1" step="0.01">
+			<button id="closeGMenu">Close</button>
+			</div>
+			<p>Click and drag to move</p>
+		</div>
 		<canvas id="myCanvas" width="800" height="800"></canvas>
 		<h3>Controls</h3>
 		<p>Left click and hold to make the balls fly to it. Press and hold right click to shoot a new ball. Middle click a ball to edit its properties.</p>

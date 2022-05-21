@@ -21,3 +21,7 @@ canvas {
 	border:2px solid #333333;
 	z-index:100;
 }
+.gMenu {
+	width:200px;
+	height:150px;
+}

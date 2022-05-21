@@ -12,7 +12,6 @@ let startX = -1;
 let startY = -1;
 
 let SHOOTDAMPED = 0.1;
-let DEFAULTSIZE = 10;
 
 let DEFAULTRADIUS = 5;
 let DEFAULTMASS = 5;
@@ -53,7 +52,7 @@ class Ball{
 	}
 }
 
-let ball = new Ball(canvas.width/2,canvas.height/2,DEFAULTSIZE,DEFAULTSIZE);
+let ball = new Ball(canvas.width/2,canvas.height/2,DEFAULTRADIUS,DEFAULTRADIUS);
 let ballArray = [ball];
 
 let selectedBall = -1;
@@ -68,7 +67,7 @@ canvas.addEventListener('mousedown', e => {
 		holdingMouse = true;
 	}
 	else if(e.button == 1){
-		//select ball middle mouse
+		//select ball or global middle mouse
 		for(let i=0;i<ballArray.length;i++){
 			let dx = ballArray[i].position.x - e.offsetX;
 			let dy = ballArray[i].position.y - e.offsetY;
@@ -88,9 +87,14 @@ canvas.addEventListener('mousedown', e => {
 				document.getElementById('green').value = ballArray[i].color.g;
 				document.getElementById('blue').value = ballArray[i].color.b;
 				selectedBall = i;
-				break;
+				return;
 			}
 		}
+		//global selected
+		document.getElementById('globalMenu').style.display = "block";
+		document.getElementById('time').value = TIME;
+		document.getElementById('gravity').value = GRAVITY;
+		document.getElementById('power').value = SHOOTDAMPED;
 	}
 	else if(e.button == 2){
 		//spawn new ball right click
@@ -103,7 +107,7 @@ canvas.addEventListener('mouseup', e => {
 		holdingMouse = false;
 	}
 	else if(e.button == 2){
-		let newBall = new Ball(startX, startY, DEFAULTSIZE, DEFAULTSIZE);
+		let newBall = new Ball(startX, startY, DEFAULTRADIUS, DEFAULTRADIUS);
 		newBall.velocity.x = (startX - e.offsetX) * SHOOTDAMPED;
 		newBall.velocity.y = (startY - e.offsetY) * SHOOTDAMPED;
 		ballArray.push(newBall);
@@ -166,13 +170,59 @@ ballmenu.addEventListener('mouseup', e => {
 });
 ballmenu.addEventListener('mousemove', e => {
 	if(moveWindow){
-		pos1 = pos3 - e.clientX;
-		pos2 = pos4 - e.clientY;
+		let pos1 = pos3 - e.clientX;
+		let pos2 = pos4 - e.clientY;
 		pos3 = e.clientX
 		pos4 = e.clientY
 		
 		ballMenu.style.top = (ballMenu.offsetTop - pos2) + "px";
 		ballMenu.style.left = (ballMenu.offsetLeft - pos1) + "px";
+	}
+});
+//global options
+let moveGWindow = false;
+let globalmenu = document.getElementById('globalMenu');
+let globalmenuoptions = document.getElementById('gOptions');
+let gPos3, gPos4;
+document.getElementById('time').addEventListener('input', e => {
+	TIME = parseFloat(e.srcElement.value);
+});
+document.getElementById('gravity').addEventListener('input', e => {
+	GRAVITY = parseFloat(e.srcElement.value);
+});
+document.getElementById('power').addEventListener('input', e => {
+	SHOOTDAMPED = parseFloat(e.srcElement.value);
+});
+document.getElementById('closeGMenu').onclick = function(){
+	globalmenu.style.display = "none";
+	selectedBall = -1;
+}
+let gTweeking = false;
+globalmenuoptions.addEventListener('mousedown', e => {
+	gTweeking = true;
+});
+globalmenuoptions.addEventListener('mouseup', e => {
+	gTweeking = false;
+});
+globalmenu.addEventListener('mousedown', e => {
+	if(!gTweeking){
+		moveGWindow = true;
+		gPos3 = e.clientX;
+		gPos4 = e.clientY;
+	}
+});
+globalmenu.addEventListener('mouseup', e => {
+	moveGWindow = false;
+});
+globalmenu.addEventListener('mousemove', e => {
+	if(moveGWindow){
+		let pos1 = gPos3 - e.clientX;
+		let pos2 = gPos4 - e.clientY;
+		gPos3 = e.clientX
+		gPos4 = e.clientY
+		
+		globalmenu.style.top = (globalmenu.offsetTop - pos2) + "px";
+		globalmenu.style.left = (globalmenu.offsetLeft - pos1) + "px";
 	}
 });
 //called on page load
@@ -201,7 +251,7 @@ function draw(){
 		
 		ctx.fillStyle = 'blue';
 		ctx.beginPath();
-		ctx.arc(startX, startY, DEFAULTSIZE, 0, 2*Math.PI, false);
+		ctx.arc(startX, startY, DEFAULTRADIUS, 0, 2*Math.PI, false);
 		ctx.fill();
 	}
 	for(let i=0;i<ballArray.length;i++){

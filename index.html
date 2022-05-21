@@ -7,9 +7,31 @@
 	</head>
 	<body>
 	<h1>Ball Toss</h1>
+		<div id="ballMenu" class="ballMenu">
+			<h4>Ball menu</h4>
+			<div id="options">
+			<label for="radius">Radius</label><input type="range" id="radius" min="1" max="100" step="1">
+			<br>
+			<label for="mass">Mass</label><input type="range" id="mass" min="1" max="100" step="1">
+			<br>
+			<label for="damp">Damp</label><input type="range" id="damp" min="0" max="1" step="0.01">
+			<br>
+			<label for="traction">Traction</label><input type="range" id="traction" min="0" max="1" step="0.01">
+			<br>
+			<label for="thrust">Thrust</label><input type="range" id="thrust" min="0" max="2" step="0.1">
+			<br>
+			<label for="red">Red</label><input type="range" id="red" min="1" max="255" step="1">
+			<br>
+			<label for="green">Green</label><input type="range" id="green" min="1" max="255" step="1">
+			<br>
+			<label for="blue">Blue</label><input type="range" id="blue" min="1" max="255" step="1">
+			<button id="closeMenu">Close</button>
+			</div>
+			<p>Click and drag to move</p>
+		</div>
 		<canvas id="myCanvas" width="800" height="800"></canvas>
 		<h3>Controls</h3>
-		<p>Click and hold with the mouse and the ball will fly to it. Press and hold right click to shoot a new ball.</p>
+		<p>Left click and hold to make the balls fly to it. Press and hold right click to shoot a new ball. Middle click a ball to edit its properties.</p>
 		<script src="./script.js" onload="init()"></script>
 	</body>
 </html>

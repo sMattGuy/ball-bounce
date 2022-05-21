@@ -14,16 +14,86 @@ let startY = -1;
 let SHOOTDAMPED = 0.1;
 let DEFAULTSIZE = 10;
 
+let DEFAULTRADIUS = 5;
+let DEFAULTMASS = 5;
+let DEFAULTDAMP = 0.9;
+let DEFAULTTRACTION = 0.9;
+let DEFAULTTHRUST = 1;
+	
 let holdingMouse = false;
+
+class Ball{
+	position = {'x':0,'y':0};
+	velocity = {'x':0,'y':0};
+	acceleration = {'x':0,'y':0};
+	force = {'x':0,'y':0};
+	radius = DEFAULTRADIUS;
+	mass = DEFAULTMASS;
+	damp = DEFAULTDAMP;
+	traction = DEFAULTTRACTION;
+	thrust = DEFAULTTHRUST;
+	color = {'r':0,'g':0,'b':0};
+
+	constructor(xposition, yposition, radius, mass){
+		this.position.x = xposition;
+		this.position.y = yposition;
+		
+		this.velocity.x = 0;
+		this.velocity.y = 0;
+		
+		this.acceleration.x = 0;
+		this.acceleration.y = 0;
+		
+		this.radius = radius;
+		this.mass = mass;
+		
+		this.color.r = Math.floor(Math.random() * 256);
+		this.color.g = Math.floor(Math.random() * 256);
+		this.color.b = Math.floor(Math.random() * 256);
+	}
+}
+
+let ball = new Ball(canvas.width/2,canvas.height/2,DEFAULTSIZE,DEFAULTSIZE);
+let ballArray = [ball];
+
+let selectedBall = -1;
+
 canvas.addEventListener('mousemove', e => {
 		xPos = e.offsetX;
 		yPos = e.offsetY;
 });
 canvas.addEventListener('mousedown', e => {
 	if(e.button == 0){
+		//attract ball left click
 		holdingMouse = true;
 	}
+	else if(e.button == 1){
+		//select ball middle mouse
+		for(let i=0;i<ballArray.length;i++){
+			let dx = ballArray[i].position.x - e.offsetX;
+			let dy = ballArray[i].position.y - e.offsetY;
+			let d = Math.sqrt(Math.pow(dx,2)+Math.pow(dy,2));
+			if(d < 1){
+				d = 1;
+			}
+			if(d < ballArray[i].radius){
+				//ball selected
+				document.getElementById("ballMenu").style.display = "block";
+				document.getElementById('radius').value = ballArray[i].radius;
+				document.getElementById('mass').value = ballArray[i].mass;
+				document.getElementById('damp').value = ballArray[i].damp;
+				document.getElementById('traction').value = ballArray[i].traction;
+				document.getElementById('thrust').value = ballArray[i].thrust;
+				document.getElementById('red').value = ballArray[i].color.r;
+				document.getElementById('green').value = ballArray[i].color.g;
+				document.getElementById('blue').value = ballArray[i].color.b;
+				selectedBall = i;
+				break;
+			}
+		}
+	}
 	else if(e.button == 2){
+		//spawn new ball right click
 		startX = e.offsetX;
 		startY = e.offsetY;
 	}
@@ -44,37 +114,67 @@ canvas.addEventListener('mouseup', e => {
 canvas.oncontextmenu = function (e) {
     e.preventDefault();
 };
-class Ball{
-	position = {'x':0,'y':0};
-	velocity = {'x':0,'y':0};
-	acceleration = {'x':0,'y':0};
-	force = {'x':0,'y':0};
-	radius = 0;
-	mass = 0;
-	damp = 0.9;
-	traction = 0.8;
-	thrust = 0.002;
-	color = {'r':0,'g':0,'b':0};
-	constructor(xposition, yposition, radius, mass){
-		this.position.x = xposition;
-		this.position.y = yposition;
-		
-		this.velocity.x = 0;
-		this.velocity.y = 0;
-		
-		this.acceleration.x = 0;
-		this.acceleration.y = 0;
-		
-		this.radius = radius;
-		this.mass = mass;
-		
-		this.color.r = Math.floor(Math.random() * 256);
-		this.color.g = Math.floor(Math.random() * 256);
-		this.color.b = Math.floor(Math.random() * 256);
-	}
+//ball menu options
+let moveWindow = false;
+let ballmenu = document.getElementById('ballMenu');
+let ballmenuoptions = document.getElementById('options');
+let pos3, pos4;
+document.getElementById('radius').addEventListener('input', e => {
+	ballArray[selectedBall].radius = parseInt(e.srcElement.value);
+});
+document.getElementById('mass').addEventListener('input', e => {
+	ballArray[selectedBall].mass = parseInt(e.srcElement.value);
+});
+document.getElementById('damp').addEventListener('input', e => {
+	ballArray[selectedBall].damp = parseFloat(e.srcElement.value);
+});
+document.getElementById('traction').addEventListener('input', e => {
+	ballArray[selectedBall].traction = parseFloat(e.srcElement.value);
+});
+document.getElementById('thrust').addEventListener('input', e => {
+	ballArray[selectedBall].thrust = parseFloat(e.srcElement.value);
+});
+document.getElementById('red').addEventListener('input', e => {
+	ballArray[selectedBall].color.r = parseInt(e.srcElement.value);
+});
+document.getElementById('green').addEventListener('input', e => {
+	ballArray[selectedBall].color.g = parseInt(e.srcElement.value);
+});
+document.getElementById('blue').addEventListener('input', e => {
+	ballArray[selectedBall].color.b = parseInt(e.srcElement.value);
+});
+document.getElementById('closeMenu').onclick = function(){
+	document.getElementById("ballMenu").style.display = "none";
+	selectedBall = -1;
 }
-let ball = new Ball(canvas.width/2,canvas.height/2,DEFAULTSIZE,DEFAULTSIZE);
-let ballArray = [ball];
+let tweeking = false;
+ballmenuoptions.addEventListener('mousedown', e => {
+	tweeking = true;
+});
+ballmenuoptions.addEventListener('mouseup', e => {
+	tweeking = false;
+});
+ballmenu.addEventListener('mousedown', e => {
+	if(!tweeking){
+		moveWindow = true;
+		pos3 = e.clientX;
+		pos4 = e.clientY;
+	}
+});
+ballmenu.addEventListener('mouseup', e => {
+	moveWindow = false;
+});
+ballmenu.addEventListener('mousemove', e => {
+	if(moveWindow){
+		pos1 = pos3 - e.clientX;
+		pos2 = pos4 - e.clientY;
+		pos3 = e.clientX
+		pos4 = e.clientY
+		
+		ballMenu.style.top = (ballMenu.offsetTop - pos2) + "px";
+		ballMenu.style.left = (ballMenu.offsetLeft - pos1) + "px";
+	}
+});
 //called on page load
 function init(){
 	//called only once
@@ -109,6 +209,11 @@ function draw(){
 		ctx.beginPath();
 		ctx.arc(ballArray[i].position.x, ballArray[i].position.y, ballArray[i].radius, 0, 2*Math.PI, false);
 		ctx.fill();
+		if(i==selectedBall){
+			ctx.strokeStyle = 'red';
+			ctx.lineWidth = 2;
+			ctx.stroke();
+		}
 	}
 }
 
@@ -125,7 +230,7 @@ function updatePosition(){
 			ballArray[i].position.y = canvas.height - ballArray[i].radius;
 			ballArray[i].velocity.x *= ballArray[i].traction;
 		}
-		else if(ballArray[i].position.y + ballArray[i].radius < 0){
+		else if(ballArray[i].position.y - ballArray[i].radius < 0){
 			ballArray[i].velocity.y = -ballArray[i].velocity.y * ballArray[i].damp;
 			ballArray[i].position.y = ballArray[i].radius;
 		}
@@ -147,8 +252,13 @@ function moveObject(){
 			let dx = ballArray[i].position.x - xPos;
 			let dy = ballArray[i].position.y - yPos;
 			
-			ballArray[i].acceleration.x = -dx * ballArray[i].thrust;
-			ballArray[i].acceleration.y = -dy * ballArray[i].thrust;
+			let d = Math.sqrt(Math.pow(dx,2)+Math.pow(dy,2));
+			if(d < 1){
+				d = 1;
+			}
+			
+			ballArray[i].acceleration.x = (-dx/d) * ballArray[i].thrust;
+			ballArray[i].acceleration.y = (-dy/d) * ballArray[i].thrust;
 		}
 		else{
 			ballArray[i].acceleration.x = 0;
@@ -160,28 +270,30 @@ function moveObject(){
 function checkCollision(){
 	for(let i=0;i<ballArray.length;i++){
 		for(let j=0;j<ballArray.length;j++){
-			let dx = ballArray[j].position.x - ballArray[i].position.x;
-			let dy = ballArray[j].position.y - ballArray[i].position.y;
-			let d = Math.sqrt(Math.pow(dx,2)+Math.pow(dy,2));
-			if(d < 1){
-				d = 1;
-			}
-			if(d < ballArray[i].radius + ballArray[j].radius){
-				let nx = dx / d;
-				let ny = dy / d;
-				let s = ballArray[i].radius + ballArray[j].radius - d;
-				ballArray[i].position.x -= nx * s/2;
-				ballArray[i].position.y -= ny * s/2;
-				ballArray[j].position.x += nx * s/2;
-				ballArray[j].position.y += ny * s/2;
-			
-				// Magic...
-				let k = -2 * ((ballArray[j].velocity.x - ballArray[i].velocity.x) * nx + (ballArray[j].velocity.y - ballArray[i].velocity.y) * ny) / (1/ballArray[i].mass + 1/ballArray[j].mass);
+			if(i < j){
+				let dx = ballArray[j].position.x - ballArray[i].position.x;
+				let dy = ballArray[j].position.y - ballArray[i].position.y;
+				let d = Math.sqrt(Math.pow(dx,2)+Math.pow(dy,2));
+				if(d < 1){
+					d = 1;
+				}
+				if(d < ballArray[i].radius + ballArray[j].radius){
+					let nx = dx / d;
+					let ny = dy / d;
+					let s = ballArray[i].radius + ballArray[j].radius - d;
+					ballArray[i].position.x -= nx * s/2;
+					ballArray[i].position.y -= ny * s/2;
+					ballArray[j].position.x += nx * s/2;
+					ballArray[j].position.y += ny * s/2;
 				
-				ballArray[i].velocity.x -= k * nx / ballArray[i].mass;
-				ballArray[i].velocity.y -= k * ny / ballArray[i].mass;
-				ballArray[j].velocity.x += k * nx / ballArray[j].mass;
-				ballArray[j].velocity.y += k * ny / ballArray[j].mass;
+					// Magic...
+					let k = -2 * ((ballArray[j].velocity.x - ballArray[i].velocity.x) * nx + (ballArray[j].velocity.y - ballArray[i].velocity.y) * ny) / (1/ballArray[i].mass + 1/ballArray[j].mass);
+					
+					ballArray[i].velocity.x -= k * nx / ballArray[i].mass;
+					ballArray[i].velocity.y -= k * ny / ballArray[i].mass;
+					ballArray[j].velocity.x += k * nx / ballArray[j].mass;
+					ballArray[j].velocity.y += k * ny / ballArray[j].mass;
+				}
 			}
 		}
 	}
